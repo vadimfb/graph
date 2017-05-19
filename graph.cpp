@@ -1,22 +1,22 @@
 #include"graph.h"
 
-graph* graph_create(int n) {
-	graph* g = (graph*)malloc(n * sizeof(graph));
+graph* graph_create(int vertex_count) {
+	graph* g = (graph*)malloc(sizeof(graph));
 	
 	if (!g) {
 		return NULL;
 	} 	
 	
-	g->n = n;
-	g->adj_matrix = (int**)calloc(n, sizeof(int *));
+	g->vertex_count = vertex_count;
+	g->adj_matrix = (int**)calloc(vertex_count, sizeof(int *));
 	
 	if (!g->adj_matrix) {
 		return NULL;
 	}
 
 	int i;
-	for (i = 0; i < n; i++) {
-		g->adj_matrix[i] = (int *)calloc(n, sizeof(int));
+	for (i = 0; i < vertex_count; i++) {
+		g->adj_matrix[i] = (int*)calloc(vertex_count, sizeof(int));
 		
 		if (!g->adj_matrix[i]) {
 			return NULL;
@@ -27,16 +27,23 @@ graph* graph_create(int n) {
 
 void graph_delete(graph* g) {
 	int i;
+	
+	if (g) {
+	
+		for (i = 0; i < g->vertex_count; i++)
+			free(g->adj_matrix[i]);
 
-	for (i = 0; i < g->n; i++)
-		free(g->adj_matrix[i]);
-
-	free(g->adj_matrix);
+		free(g->adj_matrix);
+		free(g);
+	}
 }
 
 int graph_add_edge(int u, int v, graph* g) {
-	
-	if (u > g->n || v > g->n) {
+	if (!g) {
+		return -1;
+	}	
+
+	if (u > g->vertex_count || v > g->vertex_count) {
 		return -1;
 	}
 	
@@ -46,8 +53,14 @@ int graph_add_edge(int u, int v, graph* g) {
 }
 	
 int graph_add_vertex(graph* g) {
-	g->n++;
-	g->adj_matrix = (int **)realloc(g->adj_matrix, g->n * sizeof(int *));
+	if (!g) {
+		g = graph_create(1);
+		return 1;
+	}
+
+	g->vertex_count++;
+	int n = g->vertex_count;
+	g->adj_matrix = (int **)realloc(g->adj_matrix, n * sizeof(int *));
 	
 	if (!g->adj_matrix) {
 		return -1;
@@ -55,25 +68,28 @@ int graph_add_vertex(graph* g) {
 
 	int i;
 	
-	for (i = 0; i < g->n; i++) {
-		g->adj_matrix[i] = (int *)realloc(g->adj_matrix[i], g->n * sizeof(int));
+	for (i = 0; i < n; i++) {
+		g->adj_matrix[i] = (int *)realloc(g->adj_matrix[i], n * sizeof(int));
 
 		if (!g->adj_matrix[i]) {
 			return -1;
 		}
 	}
 
-	for (i = 0; i < g->n; i++) {
-		g->adj_matrix[i][g->n - 1] = 0;
-		g->adj_matrix[g->n - 1][i] = 0;
+	for (i = 0; i < n; i++) {
+		g->adj_matrix[i][n - 1] = 0;
+		g->adj_matrix[n - 1][i] = 0;
 	}
 		
 	return 1;
 }
 
 int graph_delete_edge(int u, int v, graph* g) {
-
-	if (u > g->n || v > g->n) {
+	if (!g) {
+		return -1;
+	}
+	
+	if (u > g->vertex_count || v > g->vertex_count) {
 		return -1;
 	}
 
@@ -83,25 +99,32 @@ int graph_delete_edge(int u, int v, graph* g) {
 }
 
 int graph_delete_vertex(int u, graph* g) {
-	if (u > g->n) {
+	if (!g) {
+		return -1;
+	}
+	
+	int n = g->vertex_count;
+	
+	if (u > n) {
 		return -1;
 	}
 
-	if (g->n == 1) {
+	if (n == 1) {
 		free(g->adj_matrix[0]);
 		free(g->adj_matrix);
-		g->n = 0;
+		g->vertex_count = 0;
+		return 1;
 	}
 
 	int i, j;
-	int** new_adj_matrix = (int**)malloc((g->n - 1) * sizeof(int *));
+	int** new_adj_matrix = (int**)malloc((n - 1) * sizeof(int *));
 	
 	if (!new_adj_matrix) {
 		return -1;
 	}
 
-	for (i = 0; i < g->n - 1; i++) {
-                new_adj_matrix[i] = (int *)malloc((g->n - 1) * sizeof(int));
+	for (i = 0; i < n - 1; i++) {
+                new_adj_matrix[i] = (int *)malloc((n - 1) * sizeof(int));
 
                 if (!new_adj_matrix[i]) {
                         return -1;
@@ -109,11 +132,11 @@ int graph_delete_vertex(int u, graph* g) {
 	
 	}
 	
-	for (i = u - 1; i < g->n - 1; i++)
+	for (i = u - 1; i < n - 1; i++)
 		g->adj_matrix[i] = g->adj_matrix[i + 1];
 	
-	for (i = 0; i < g->n - 1; i++) {
-		for (j = 0; j < g->n - 1; j++) {
+	for (i = 0; i < n - 1; i++) {
+		for (j = 0; j < n - 1; j++) {
 			if (j < u - 1)
 				new_adj_matrix[i][j] = g->adj_matrix[i][j];
 			else
@@ -121,10 +144,45 @@ int graph_delete_vertex(int u, graph* g) {
 		}
 	}
 	g->adj_matrix = new_adj_matrix;
-	g->n--;
+	g->vertex_count--;
 	return 1;
 }
+
+int graph_has_edge(int u, int v, graph* g) {
+	if (!g) {
+		return -1;
+	}
 	
+	if (u > g->vertex_count || v > g->vertex_count) {
+		return -1;
+	}
+
+	if (g->adj_matrix[u - 1][v - 1] == 1)
+		return 1;
+
+	return 0;
+}
+
+int graph_vertex_count(graph* g) {
 	
+	if (!g) {
+		return -1;	
+	}
 	
+	return g->vertex_count;
+
+}
+
+int graph_edge_count(graph* g) {
 	
+	if (!g) {
+		return -1;
+	}
+
+	int i, j, count, n = g->vertex_count;
+	for (i = 0; i < n; i++)
+		for (j = 0; i < n; j++)
+			if (g->adj_matrix[i][j])
+				count++;
+	return count;
+}

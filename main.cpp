@@ -5,9 +5,11 @@
 int init_suite(void) { return 0; }
 int clean_suite(void) { return 0; }
 
+int err;
+
 void test_create_delete() {
-	int flag1 = 0, flag2 = 0;
-	graph* g = graph_create(3);
+	int flag1 = 0;
+	graph* g = graph_create(3, &err);
 	if (g->vertex_count == 3) {
 		int i, j;
 		for (i = 0; i < 3; i++)
@@ -29,7 +31,7 @@ void test_create_delete() {
 }
 
 void test_add_edge_vertex() {
-	graph* g = graph_create(4);
+	graph* g = graph_create(4, &err);
 	graph_add_edge(1, 2, g);
 	graph_add_edge(2, 1, g);
 	graph_add_edge(2, 3, g);
@@ -56,7 +58,7 @@ void test_add_edge_vertex() {
 }
 
 void test_delete_edge_vertex() {
-	graph* g = graph_create(4);
+	graph* g = graph_create(4, &err);
         graph_add_edge(1, 2, g);
         graph_add_edge(2, 1, g);
         graph_add_edge(2, 3, g);
@@ -90,7 +92,7 @@ void test_delete_edge_vertex() {
 }
 
 void test_has_edge_count_vertex_edge() {
-	graph* g = graph_create(4);
+	graph* g = graph_create(4, &err);
         graph_add_edge(1, 2, g);
         graph_add_edge(2, 1, g);
         graph_add_edge(2, 3, g);
@@ -116,7 +118,7 @@ void test_has_edge_count_vertex_edge() {
 }
 
 void test_get_matrix() {
-	graph* g = graph_create(1);
+	graph* g = graph_create(1, &err);
 	int** tmp = (int **)calloc(5, sizeof(int *));
 	int i, j, flag = 0;
 	for (i = 0; i < 5; i++) {
@@ -137,7 +139,7 @@ void test_get_matrix() {
 }
 
 void test_dfs_search() {
-	graph* g = graph_create(4);
+	graph* g = graph_create(4, &err);
         graph_add_edge(1, 2, g);
         graph_add_edge(2, 1, g);
         graph_add_edge(2, 3, g);
@@ -147,7 +149,7 @@ void test_dfs_search() {
         graph_add_edge(3, 5, g);
         graph_add_edge(1, 3, g);
         graph_add_edge(5, 4, g);
-	int* visit = search(3, g);
+	int* visit = search(3, g, &err);
 	int* visited = (int *)calloc(5, sizeof(int));
 	dfs(3, visited, g);
 	int flag = 0, i;
@@ -164,25 +166,25 @@ void test_dfs_search() {
 }
 
 void test_wrong_arg() {
-	graph* g = graph_create(4);
+	graph* g = graph_create(4, &err);
 	int flag1 = graph_add_edge(4, 5, g);
 	int flag2 = graph_delete_edge(4, 5, g);
 	int flag3 = graph_delete_vertex(5, g);
 	graph* g1 = NULL;
 	int flag4 = graph_delete_vertex(0, g1);
-	if (flag1 != -1) {
+	if (flag1 != EINVARG) {
 		CU_FAIL("add edge\n");
 	}
-	if (flag2 != -1) {
+	if (flag2 != EINVARG) {
 		CU_FAIL("delete edge\n");
 	}
-	if (flag3 != -1) {
+	if (flag3 != EINVARG) {
 		CU_FAIL("delete vertex\n");
 	}
-	if (flag4 != -1) {
+	if (flag4 != EINVARG) {
 		CU_FAIL("delete vertex\n");
 	}
-	if (flag1 != -1 && flag2 != -1 && flag3 != -1 && flag4 != -1) {
+	if (flag1 != EINVARG && flag2 != EINVARG && flag3 != EINVARG && flag4 != EINVARG) {
 		CU_PASS("passed\n");
 	}
 }

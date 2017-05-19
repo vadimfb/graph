@@ -8,11 +8,9 @@ struct graph {
 
 typedef struct graph graph;	
 
-graph* graph_create(int vertex_count);
+graph* graph_create(int vertex_count, int* error);
 
 int get_adj_matrix(int n, int** adj_matrix, graph* g);
-
-int print_adj_matrix(graph* g);
 
 void graph_delete(graph** g);
 
@@ -32,4 +30,11 @@ int graph_edge_count(graph* g);
 
 void dfs(int u, int* visited, graph* g);
 
-int* search(int u, graph* g);
+int* search(int u, graph* g, int* error);
+
+enum {
+	ENOSUCCESS,
+	ESUCCESS,
+	EINVARG,
+	EALLOC
+};

@@ -210,9 +210,14 @@ void dfs(int u, int* visited, graph* g) {
 }
 
 int* search(int u, graph* g) {
-	int i;
-	int* visited = (int*)calloc(g->vertex_count, sizeof(int));
 	
+	if (!g) {
+		return NULL;
+	}
+
+	int i;
+	int* visited = (int*)calloc(g->vertex_count, sizeof(int));	
+
 	if (!visited) {
 		return NULL;
 	}

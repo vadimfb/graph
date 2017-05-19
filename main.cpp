@@ -136,7 +136,56 @@ void test_get_matrix() {
 	}
 }
 
-void test_dfs_search();
+void test_dfs_search() {
+	graph* g = graph_create(4);
+        graph_add_edge(1, 2, g);
+        graph_add_edge(2, 1, g);
+        graph_add_edge(2, 3, g);
+        graph_add_edge(3, 4, g);
+        graph_add_vertex(g);
+        graph_add_edge(4, 5, g);
+        graph_add_edge(3, 5, g);
+        graph_add_edge(1, 3, g);
+        graph_add_edge(5, 4, g);
+	int* visit = search(3, g);
+	int* visited = (int *)calloc(5, sizeof(int));
+	dfs(3, visited, g);
+	int flag = 0, i;
+	int answer[] = {0, 0, 1, 1, 1};
+	for (i = 0; i < 5; i++)
+		if (visit[i] != answer[i] || visited[i] != answer[i])
+			flag = 1;
+	if (flag) {
+		CU_FAIL("dfs failed\n");
+	}
+	else {
+		CU_PASS("dfs passed\n");
+	}
+}
+
+void test_wrong_arg() {
+	graph* g = graph_create(4);
+	int flag1 = graph_add_edge(4, 5, g);
+	int flag2 = graph_delete_edge(4, 5, g);
+	int flag3 = graph_delete_vertex(5, g);
+	graph* g1 = NULL;
+	int flag4 = graph_delete_vertex(0, g1);
+	if (flag1 != -1) {
+		CU_FAIL("add edge\n");
+	}
+	if (flag2 != -1) {
+		CU_FAIL("delete edge\n");
+	}
+	if (flag3 != -1) {
+		CU_FAIL("delete vertex\n");
+	}
+	if (flag4 != -1) {
+		CU_FAIL("delete vertex\n");
+	}
+	if (flag1 != -1 && flag2 != -1 && flag3 != -1 && flag4 != -1) {
+		CU_PASS("passed\n");
+	}
+}
 	
 int main() {
 	CU_pSuite pSuite = NULL;
@@ -156,7 +205,9 @@ int main() {
 	    (NULL == CU_add_test(pSuite, "test_add", test_add_edge_vertex)) ||
 	    (NULL == CU_add_test(pSuite, "test_delete", test_delete_edge_vertex)) ||
 	    (NULL == CU_add_test(pSuite, "test_get_matrix", test_get_matrix)) ||
-	    (NULL == CU_add_test(pSuite, "test_has_edge_count", test_has_edge_count_vertex_edge))) {
+	    (NULL == CU_add_test(pSuite, "test_has_edge_count", test_has_edge_count_vertex_edge)) ||
+	    (NULL == CU_add_test(pSuite, "test_dfs", test_dfs_search)) ||
+	    (NULL == CU_add_test(pSuite, "teswrongarg", test_wrong_arg))) {
 			CU_cleanup_registry();
       			return CU_get_error();
    	}

@@ -132,7 +132,8 @@ int graph_delete_vertex(int u, graph* g) {
 	}
 	
 	for (i = u - 1; i < n - 1; i++)
-		g->adj_matrix[i] = g->adj_matrix[i + 1];
+		for (j = 0; j < n; j++)
+			g->adj_matrix[i][j] = g->adj_matrix[i + 1][j];
 
 	for (i = 0; i < n - 1; i++) {
 		for (j = 0; j < n - 1; j++) {
@@ -142,7 +143,10 @@ int graph_delete_vertex(int u, graph* g) {
 				tmp[i][j] =  g->adj_matrix[i][j + 1];
 		}
 	}
-
+	
+	for (i = 0; i < n; i++)
+		free(g->adj_matrix[i]);
+	free(g->adj_matrix);
 	g->adj_matrix = tmp;
 	g->vertex_count--;
 	return 1;
@@ -157,7 +161,7 @@ int graph_has_edge(int u, int v, graph* g) {
 		return -1;
 	}
 
-	if (g->adj_matrix[u - 1][v - 1] == 1)
+	if (g->adj_matrix[u - 1][v - 1])
 		return 1;
 
 	return 0;
@@ -179,26 +183,25 @@ int graph_edge_count(graph* g) {
 		return -1;
 	}
 
-	int i, j, count, n = g->vertex_count;
+	int i, j, count = 0, n = g->vertex_count;
 	for (i = 0; i < n; i++)
-		for (j = 0; i < n; j++)
+		for (j = 0; j < n; j++)
 			if (g->adj_matrix[i][j])
 				count++;
 	return count;
 }
 
-int get_adj_matrix(int** adj_matrix, graph* g) {
+int get_adj_matrix(int n, int** adj_matrix, graph* g) {
 	
 	if (!g) {
 		return -1;
 	}
 	int i;
 	for (i = 0; i < g->vertex_count; i++)
-		free(g->adj_matrix);
-	free(g->adj_matrix);
-	
+		free(g->adj_matrix[i]);
+	free(g->adj_matrix);	
 	g->adj_matrix = adj_matrix;
-	g->vertex_count = int(sizeof(adj_matrix) / sizeof(int));
+	g->vertex_count = n;
 
 	return 1;
 }
@@ -210,10 +213,33 @@ int print_adj_matrix(graph* g) {
 	}
 	
 	int i, j;
+	printf("--Adjancy matrix--\n");
 	for (i = 0; i < g->vertex_count; i++) {
 		for (j = 0; j < g->vertex_count; j++)
 			printf("%d ", g->adj_matrix[i][j]);
 		printf("\n");
 	}
 	return 1;
+}
+
+void dfs(int u, int* visited, graph* g) {
+	visited[u - 1] = 1;
+	int i;
+	for (i = 0; i < g->vertex_count; i++) {
+		if (g->adj_matrix[u - 1][i] && visited[i] == 0) {
+			dfs(i + 1, visited, g);
+		}
+	}
+}
+
+int* search(int u, graph* g) {
+	int i;
+	int* visited = (int*)calloc(g->vertex_count, sizeof(int));
+	
+	if (!visited) {
+		return NULL;
+	}
+	
+	dfs(u, visited, g);
+	return visited;
 }

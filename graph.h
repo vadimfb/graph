@@ -10,7 +10,7 @@ typedef struct graph graph;
 
 graph* graph_create(int vertex_count);
 
-int get_adj_matrix(int** adj_matrix, graph* g);
+int get_adj_matrix(int n, int** adj_matrix, graph* g);
 
 int print_adj_matrix(graph* g);
 
@@ -30,4 +30,6 @@ int graph_vertex_count(graph* g);
 
 int graph_edge_count(graph* g);
 
-void dfs(int u, int** visited, graph* g);
+void dfs(int u, int* visited, graph* g);
+
+int* search(int u, graph* g);

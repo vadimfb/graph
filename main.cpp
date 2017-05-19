@@ -34,11 +34,29 @@ void test_create_delete() {
 }
 
 void test_add_edge_vertex() {
-	graph* g = create_graph(4);
+	graph* g = graph_create(4);
 	graph_add_edge(1, 2, g);
 	graph_add_edge(2, 1, g);
 	graph_add_edge(2, 3, g);
-	graph_add_
+	graph_add_edge(3, 4, g);
+	graph_add_vertex(g);
+	graph_add_edge(4, 5, g);
+	int matrix[5][5] = {0, 1, 0, 0, 0, 
+			    1, 0, 1, 0, 0, 
+			    0, 0, 0, 1, 0, 
+			    0, 0, 0, 0, 1, 
+			    0, 0, 0, 0, 0};
+	int i, j, flag = 0;
+	for (i = 0; i < 5; i++)
+		for (j = 0; j < 5; j++)
+			if (g->adj_matrix[i][j] != matrix[i][j])
+				flag = 1;
+	if (flag) {
+		CU_FAIL("graph_add_edge_or_vertex\n");
+	}
+	else {
+		CU_PASS("graph_add_edge_and_vertex\n");
+	}
 }
 
 int main() {
@@ -55,7 +73,8 @@ int main() {
       		return CU_get_error();
    	}
    	/* add the tests to the suite */
-	if ( (NULL == CU_add_test(pSuite, "test_create", test_create_delete))) {
+	if ((NULL == CU_add_test(pSuite, "test_create", test_create_delete)) ||
+	    (NULL == CU_add_test(pSuite, "test_add", test_add_edge_vertex))) {
 			CU_cleanup_registry();
       			return CU_get_error();
    	}

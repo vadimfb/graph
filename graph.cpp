@@ -1,10 +1,10 @@
 #include"graph.h"
 
-graph* graph_create(int vertex_count,  int* error) {
+graph* graph_create(int vertex_count,  int error) {
 	graph* g = (graph*)malloc(sizeof(graph));
 	
 	if (!g) {
-		*error = EALLOC;
+		error = EALLOC;
 		return NULL;
 	} 	
 	
@@ -12,7 +12,7 @@ graph* graph_create(int vertex_count,  int* error) {
 	g->adj_matrix = (int**)calloc(vertex_count, sizeof(int *));
 	
 	if (!g->adj_matrix) {
-		*error = EALLOC;
+		error = EALLOC;
 		return NULL;
 	}
 
@@ -21,11 +21,11 @@ graph* graph_create(int vertex_count,  int* error) {
 		g->adj_matrix[i] = (int*)calloc(vertex_count, sizeof(int));
 		
 		if (!g->adj_matrix[i]) {
-			*error = EALLOC;
+			error = EALLOC;
 			return NULL;
 		}
 	}
-	*error = ESUCCESS;
+	error = ESUCCESS;
 	return g;
 }
 
@@ -54,11 +54,10 @@ int graph_add_edge(int u, int v, graph* g) {
 	return ESUCCESS;	
 }
 	
-int graph_add_vertex(graph* g) {
+int graph_add_vertex(graph* g, int error) {
 	if (!g) {
-		int err;
-		g = graph_create(1, &err);
-		return err;
+		g = graph_create(1, error);
+		return EINVARG;
 	}
 
 	g->vertex_count++;
@@ -198,21 +197,21 @@ void dfs(int u, int* visited, graph* g) {
 	}
 }
 
-int* search(int u, graph* g, int* error) {
+int* search(int u, graph* g, int error) {
 	
 	if (!g) {
-		*error = EINVARG;
+		error = EINVARG;
 		return NULL;
 	}
 
 	int* visited = (int*)calloc(g->vertex_count, sizeof(int));	
 
 	if (!visited) {
-		*error = EALLOC;
+		error = EALLOC;
 		return NULL;
 	}
 	
 	dfs(u, visited, g);
-	*error = ESUCCESS;
+	error = ESUCCESS;
 	return visited;
 }

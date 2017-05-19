@@ -2,14 +2,14 @@
 #include <CUnit/CUnit.h>
 #include "CUnit/Basic.h"
 
+int err;
+
 int init_suite(void) { return 0; }
 int clean_suite(void) { return 0; }
 
-int err;
-
 void test_create_delete() {
 	int flag1 = 0;
-	graph* g = graph_create(3, &err);
+	graph* g = graph_create(3, err);
 	if (g->vertex_count == 3) {
 		int i, j;
 		for (i = 0; i < 3; i++)
@@ -31,12 +31,12 @@ void test_create_delete() {
 }
 
 void test_add_edge_vertex() {
-	graph* g = graph_create(4, &err);
+	graph* g = graph_create(4, err);
 	graph_add_edge(1, 2, g);
 	graph_add_edge(2, 1, g);
 	graph_add_edge(2, 3, g);
 	graph_add_edge(3, 4, g);
-	graph_add_vertex(g);
+	graph_add_vertex(g, err);
 	graph_add_edge(4, 5, g);
 	int matrix[5][5] = {0, 1, 0, 0, 0, 
 			    1, 0, 1, 0, 0, 
@@ -58,18 +58,18 @@ void test_add_edge_vertex() {
 }
 
 void test_delete_edge_vertex() {
-	graph* g = graph_create(4, &err);
+	graph* g = graph_create(4, err);
         graph_add_edge(1, 2, g);
         graph_add_edge(2, 1, g);
         graph_add_edge(2, 3, g);
         graph_add_edge(3, 4, g);
-        graph_add_vertex(g);
+        graph_add_vertex(g, err);
         graph_add_edge(4, 5, g);
 	graph_add_edge(3, 5, g);
 	graph_add_edge(1, 3, g);
 	graph_add_edge(5, 4, g);
 	graph_delete_edge(3, 4, g);
-	graph_add_vertex(g);
+	graph_add_vertex(g, err);
 	graph_delete_vertex(2, g);
 	int matrix[5][5] = {0, 1, 0, 0,0,
 			    0, 0, 0, 1,0,
@@ -92,12 +92,12 @@ void test_delete_edge_vertex() {
 }
 
 void test_has_edge_count_vertex_edge() {
-	graph* g = graph_create(4, &err);
+	graph* g = graph_create(4, err);
         graph_add_edge(1, 2, g);
         graph_add_edge(2, 1, g);
         graph_add_edge(2, 3, g);
         graph_add_edge(3, 4, g);
-        graph_add_vertex(g);
+        graph_add_vertex(g, err);
         graph_add_edge(4, 5, g);
         graph_add_edge(3, 5, g);
         graph_add_edge(1, 3, g);
@@ -118,7 +118,7 @@ void test_has_edge_count_vertex_edge() {
 }
 
 void test_get_matrix() {
-	graph* g = graph_create(1, &err);
+	graph* g = graph_create(1, err);
 	int** tmp = (int **)calloc(5, sizeof(int *));
 	int i, j, flag = 0;
 	for (i = 0; i < 5; i++) {
@@ -139,17 +139,17 @@ void test_get_matrix() {
 }
 
 void test_dfs_search() {
-	graph* g = graph_create(4, &err);
+	graph* g = graph_create(4, err);
         graph_add_edge(1, 2, g);
         graph_add_edge(2, 1, g);
         graph_add_edge(2, 3, g);
         graph_add_edge(3, 4, g);
-        graph_add_vertex(g);
+        graph_add_vertex(g, err);
         graph_add_edge(4, 5, g);
         graph_add_edge(3, 5, g);
         graph_add_edge(1, 3, g);
         graph_add_edge(5, 4, g);
-	int* visit = search(3, g, &err);
+	int* visit = search(3, g, err);
 	int* visited = (int *)calloc(5, sizeof(int));
 	dfs(3, visited, g);
 	int flag = 0, i;
@@ -166,7 +166,7 @@ void test_dfs_search() {
 }
 
 void test_wrong_arg() {
-	graph* g = graph_create(4, &err);
+	graph* g = graph_create(4, err);
 	int flag1 = graph_add_edge(4, 5, g);
 	int flag2 = graph_delete_edge(4, 5, g);
 	int flag3 = graph_delete_vertex(5, g);

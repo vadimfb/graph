@@ -89,8 +89,31 @@ void test_delete_edge_vertex() {
 	
 }
 
-void test_hasedge_count_vertex_edge();
-
+void test_has_edge_count_vertex_edge() {
+	graph* g = graph_create(4);
+        graph_add_edge(1, 2, g);
+        graph_add_edge(2, 1, g);
+        graph_add_edge(2, 3, g);
+        graph_add_edge(3, 4, g);
+        graph_add_vertex(g);
+        graph_add_edge(4, 5, g);
+        graph_add_edge(3, 5, g);
+        graph_add_edge(1, 3, g);
+        graph_add_edge(5, 4, g);
+	int flag = 0;
+	flag = graph_has_edge(2, 3, g) - 1;
+	flag = graph_has_edge(1, 5, g);
+	if (graph_vertex_count(g) != 5)
+		flag = 1;
+	if (graph_edge_count(g) != 8)
+		flag = 1;
+	if (flag) {
+		CU_FAIL("graph_has_edge, graph_count failed\n");
+	}
+	else
+		CU_PASS("graph_has_edge, graph_count succesed\n");
+	graph_delete(&g);
+}
 
 void test_get_matrix() {
 	graph* g = graph_create(1);
@@ -112,6 +135,8 @@ void test_get_matrix() {
 		CU_PASS("get_matrix passed\n");
 	}
 }
+
+void test_dfs_search();
 	
 int main() {
 	CU_pSuite pSuite = NULL;
@@ -130,7 +155,8 @@ int main() {
 	if ((NULL == CU_add_test(pSuite, "test_create", test_create_delete)) ||
 	    (NULL == CU_add_test(pSuite, "test_add", test_add_edge_vertex)) ||
 	    (NULL == CU_add_test(pSuite, "test_delete", test_delete_edge_vertex)) ||
-	    (NULL == CU_add_test(pSuite, "test_get_matrix", test_get_matrix))) {
+	    (NULL == CU_add_test(pSuite, "test_get_matrix", test_get_matrix)) ||
+	    (NULL == CU_add_test(pSuite, "test_has_edge_count", test_has_edge_count_vertex_edge))) {
 			CU_cleanup_registry();
       			return CU_get_error();
    	}

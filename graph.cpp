@@ -25,16 +25,14 @@ graph* graph_create(int vertex_count) {
 	return g;
 }
 
-void graph_delete(graph* g) {
+void graph_delete(graph** g) {
 	int i;
+	if (*g) {
 	
-	if (g) {
-	
-		for (i = 0; i < g->vertex_count; i++)
-			free(g->adj_matrix[i]);
-
-		free(g->adj_matrix);
-		free(g);
+		for (i = 0; i < (*g)->vertex_count; i++)
+			free((*g)->adj_matrix[i]);
+		free((*g)->adj_matrix);
+		free(*g);
 	}
 }
 

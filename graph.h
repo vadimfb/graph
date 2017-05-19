@@ -14,7 +14,7 @@ int get_adj_matrix(int n, int** adj_matrix, graph* g);
 
 int print_adj_matrix(graph* g);
 
-void graph_delete(graph* g);
+void graph_delete(graph** g);
 
 int graph_add_edge(int u, int v, graph* g);
 

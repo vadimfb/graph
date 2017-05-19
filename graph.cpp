@@ -115,37 +115,16 @@ int graph_delete_vertex(int u, graph* g) {
 	}
 
 	int i, j;
-	int** tmp = (int**)malloc((n - 1) * sizeof(int));
-	
-	if (!tmp) {
-		return -1;
-	}
-	
-	for (i = 0; i < n - 1; i++) {
-		tmp[i] = (int*)malloc((n - 1) * sizeof(int));
-
-		if (!tmp[i]) {
-			return -1;
-		}
-	}
-	
 	for (i = u - 1; i < n - 1; i++)
 		for (j = 0; j < n; j++)
 			g->adj_matrix[i][j] = g->adj_matrix[i + 1][j];
 
 	for (i = 0; i < n - 1; i++) {
-		for (j = 0; j < n - 1; j++) {
-			if (j < u - 1)
-				tmp[i][j] = g->adj_matrix[i][j];
-			else
-				tmp[i][j] =  g->adj_matrix[i][j + 1];
+		for (j = u - 1; j < n - 1; j++) {
+			g->adj_matrix[i][j] =  g->adj_matrix[i][j + 1];
 		}
 	}
-	
-	for (i = 0; i < n; i++)
-		free(g->adj_matrix[i]);
-	free(g->adj_matrix);
-	g->adj_matrix = tmp;
+	free(g->adj_matrix[g->vertex_count - 1]);
 	g->vertex_count--;
 	return 1;
 }

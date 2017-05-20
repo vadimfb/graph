@@ -123,6 +123,9 @@ void test_delete_edge_vertex() {
                         if (g->adj_matrix[i][j] != matrix[i][j])
                                 flag = 1;
 	graph* g1 = NULL;
+	graph* g2 = graph_create(1, err);
+	if (graph_delete_vertex(1, g2) != ESUCCESS)
+		flag = 1;
 	if (graph_delete_edge(1, 2, g1) != EINVARG)
 		flag = 1;
 	if (graph_delete_edge(4, 5, g) != EINVARG)
@@ -184,10 +187,10 @@ void test_has_edge_count_vertex_edge() {
 
 void test_get_matrix() {
 	graph* g = graph_create(1, err);
-	int** tmp = (int **)calloc(5, sizeof(int *));
+	int** tmp = (int**)calloc(5, sizeof(int *));
 	int i, j, flag = 0;
 	for (i = 0; i < 5; i++) {
-		tmp[i] = (int *)calloc(5, sizeof(int));
+		tmp[i] = (int*)calloc(5, sizeof(int));
 		tmp[i][4 - i] = 1;
 	}
 	get_adj_matrix(5, tmp, g);
@@ -195,6 +198,9 @@ void test_get_matrix() {
 		for (j = 0; j < 5; j++)
 			if (g->adj_matrix[i][j] != tmp[i][j])
 				flag = 1;
+	graph* g1 = NULL;
+	if (get_adj_matrix(0, NULL, g1) != EINVARG)
+		flag = 1;
 	if (flag) {
 		CU_FAIL("get_matrix failed\n");
 	}
@@ -222,35 +228,16 @@ void test_dfs_search() {
 	for (i = 0; i < 5; i++)
 		if (visit[i] != answer[i] || visited[i] != answer[i])
 			flag = 1;
+	graph* g1 = NULL;
+	visit = search(1, g1, err);
+	if (err != EINVARG || visit != NULL) {
+		flag = 1;
+	}
 	if (flag) {
 		CU_FAIL("dfs failed\n");
 	}
 	else {
 		CU_PASS("dfs passed\n");
-	}
-}
-
-void test_wrong_arg() {
-	graph* g = graph_create(4, err);
-	int flag1 = graph_add_edge(4, 5, g);
-	int flag2 = graph_delete_edge(4, 5, g);
-	int flag3 = graph_delete_vertex(5, g);
-	graph* g1 = NULL;
-	int flag4 = graph_delete_vertex(0, g1);
-	if (flag1 != EINVARG) {
-		CU_FAIL("add edge\n");
-	}
-	if (flag2 != EINVARG) {
-		CU_FAIL("delete edge\n");
-	}
-	if (flag3 != EINVARG) {
-		CU_FAIL("delete vertex\n");
-	}
-	if (flag4 != EINVARG) {
-		CU_FAIL("delete vertex\n");
-	}
-	if (flag1 != EINVARG && flag2 != EINVARG && flag3 != EINVARG && flag4 != EINVARG) {
-		CU_PASS("passed\n");
 	}
 }
 	
@@ -274,8 +261,7 @@ int main() {
 	    (NULL == CU_add_test(pSuite, "test_delete", test_delete_edge_vertex)) ||
 	    (NULL == CU_add_test(pSuite, "test_get_matrix", test_get_matrix)) ||
 	    (NULL == CU_add_test(pSuite, "test_has_edge_count", test_has_edge_count_vertex_edge)) ||
-	    (NULL == CU_add_test(pSuite, "test_dfs", test_dfs_search)) ||
-	    (NULL == CU_add_test(pSuite, "teswrongarg", test_wrong_arg))) {
+	    (NULL == CU_add_test(pSuite, "test_dfs", test_dfs_search))) {
 			CU_cleanup_registry();
       			return CU_get_error();
    	}

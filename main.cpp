@@ -153,11 +153,26 @@ void test_has_edge_count_vertex_edge() {
         graph_add_edge(1, 3, g);
         graph_add_edge(5, 4, g);
 	int flag = 0;
-	flag = graph_has_edge(2, 3, g) - 1;
-	flag = graph_has_edge(1, 5, g);
+	if (graph_has_edge(2, 3, g) != 1) {
+		flag = 1;
+	}
+	if (graph_has_edge(1, 5, g) != 0) {
+		flag = 1;
+	}
+	if (graph_has_edge(1, 6, g) != EINVARG) {
+		flag = 1;
+	}
+	graph* g1 = NULL;
+	if (graph_has_edge(1, 2, g1) != EINVARG) {
+		flag = 1;
+	}
 	if (graph_vertex_count(g) != 5)
 		flag = 1;
 	if (graph_edge_count(g) != 8)
+		flag = 1;
+	if (graph_vertex_count(g1) != EINVARG)
+		flag = 1;
+	if (graph_edge_count(g1) != EINVARG)
 		flag = 1;
 	if (flag) {
 		CU_FAIL("graph_has_edge, graph_count failed\n");

@@ -57,7 +57,7 @@ int graph_add_edge(int u, int v, graph* g) {
 int graph_add_vertex(graph* g, int error) {
 	if (!g) {
 		g = graph_create(1, error);
-		return EINVARG;
+		return ESUCCESS;
 	}
 
 	g->vertex_count++;
@@ -143,9 +143,9 @@ int graph_has_edge(int u, int v, graph* g) {
 	}
 
 	if (g->adj_matrix[u - 1][v - 1])
-		return ESUCCESS;
+		return 1;
 
-	return ENOSUCCESS;
+	return 0;
 }
 
 int graph_vertex_count(graph* g) {

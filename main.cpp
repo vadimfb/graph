@@ -7,7 +7,7 @@ int err;
 int init_suite(void) { return 0; }
 int clean_suite(void) { return 0; }
 
-void test_create_delete() {
+void test_create() {
 	int flag1 = 0;
 	graph* g = graph_create(3, err);
 	if (g->vertex_count == 3) {
@@ -24,19 +24,18 @@ void test_create_delete() {
 		CU_FAIL("graph_create failed\n");
 		flag1 = 1;
 	}
-	graph_delete(&g);	
 	if (!flag1) {
 		CU_PASS("graph_create and graph_delete succesed\n");
 	}
+	graph_delete(&g);
 }
 
-void test_add_edge_vertex() {
-	graph* g = graph_create(4, err);
+void test_add_edge() {
+	graph* g = graph_create(5, err);
 	graph_add_edge(1, 2, g);
 	graph_add_edge(2, 1, g);
 	graph_add_edge(2, 3, g);
 	graph_add_edge(3, 4, g);
-	graph_add_vertex(g, err);
 	graph_add_edge(4, 5, g);
 	int matrix[5][5] = {0, 1, 0, 0, 0, 
 			    1, 0, 1, 0, 0, 
@@ -48,13 +47,54 @@ void test_add_edge_vertex() {
 		for (j = 0; j < 5; j++)
 			if (g->adj_matrix[i][j] != matrix[i][j])
 				flag = 1;
+	graph* g1 = NULL;
+	err = graph_add_edge(1, 2, g1);
+	if (err != EINVARG)
+		flag = 1;
+	err = graph_add_edge(4, 6, g);
+	if (err != EINVARG)
+		flag = 1;
 	if (flag) {
-		CU_FAIL("graph_add_edge_or_vertex\n");
+		CU_FAIL("graph_add_edge failed\n");
 	}
 	else {
-		CU_PASS("graph_add_edge_and_vertex\n");
+		CU_PASS("graph_add_edge passed\n");
 	}
 	graph_delete(&g);
+}
+
+void test_add_vertex() {
+	graph* g = graph_create(2, err);
+	graph_add_vertex(g, err);
+        graph_add_edge(1, 2, g);
+	graph_add_vertex(g, err);
+        graph_add_edge(2, 1, g);
+        graph_add_edge(2, 3, g);
+	graph_add_vertex(g, err);
+        graph_add_edge(3, 4, g);
+        graph_add_edge(4, 5, g);
+	int matrix[5][5] = {0, 1, 0, 0, 0,
+                            1, 0, 1, 0, 0,
+                            0, 0, 0, 1, 0,
+                            0, 0, 0, 0, 1,
+                            0, 0, 0, 0, 0};
+        int i, j, flag = 0;
+        for (i = 0; i < 5; i++)
+                for (j = 0; j < 5; j++)
+                        if (g->adj_matrix[i][j] != matrix[i][j])
+                                flag = 1;
+	graph * g1 = NULL;
+	int val = graph_add_vertex(g1, err);
+	if (val != ESUCCESS)
+		flag = 1;
+	if (flag) {
+                CU_FAIL("graph_add_vertex failed\n");
+        }
+        else {
+                CU_PASS("graph_add_vertex passed\n");
+        }
+        graph_delete(&g);
+	graph_delete(&g1);
 }
 
 void test_delete_edge_vertex() {
@@ -71,21 +111,31 @@ void test_delete_edge_vertex() {
 	graph_delete_edge(3, 4, g);
 	graph_add_vertex(g, err);
 	graph_delete_vertex(2, g);
-	int matrix[5][5] = {0, 1, 0, 0,0,
-			    0, 0, 0, 1,0,
-			    0, 0, 0, 1,0,
-			    0, 0, 1, 0,0,
-			    0, 0, 0, 0,0};
+	graph_delete_vertex(5, g);
+	graph_delete_edge(1, 2, g);
+	int matrix[4][4] = {0, 0, 0, 0,
+			    0, 0, 0, 1,
+			    0, 0, 0, 1,
+			    0, 0, 1, 0};
 	int i, j, flag = 0;
-        for (i = 0; i < 5; i++)
-                for (j = 0; j < 5; j++)
+        for (i = 0; i < 4; i++)
+                for (j = 0; j < 4; j++)
                         if (g->adj_matrix[i][j] != matrix[i][j])
                                 flag = 1;
+	graph* g1 = NULL;
+	if (graph_delete_edge(1, 2, g1) != EINVARG)
+		flag = 1;
+	if (graph_delete_edge(4, 5, g) != EINVARG)
+		flag = 1;
+	if (graph_delete_vertex(5, g) != EINVARG)
+		flag = 1;
+	if (graph_delete_vertex(1, g1) != EINVARG)
+		flag = 1;
         if (flag) {
-                CU_FAIL("graph_delete_edge_or_vertex\n");
+                CU_FAIL("graph_delete_edge_or_vertex failed\n");
         }
         else {
-                CU_PASS("graph_delete_edge_and_vertex\n");
+                CU_PASS("graph_delete_edge_and_vertex passed\n");
         }
 	graph_delete(&g);
 	
@@ -203,8 +253,9 @@ int main() {
       		return CU_get_error();
    	}
    	/* add the tests to the suite */
-	if ((NULL == CU_add_test(pSuite, "test_create", test_create_delete)) ||
-	    (NULL == CU_add_test(pSuite, "test_add", test_add_edge_vertex)) ||
+	if ((NULL == CU_add_test(pSuite, "test_create", test_create)) ||
+	    (NULL == CU_add_test(pSuite, "test_add_ver", test_add_vertex)) ||
+	    (NULL == CU_add_test(pSuite, "test_add_edge", test_add_edge)) ||
 	    (NULL == CU_add_test(pSuite, "test_delete", test_delete_edge_vertex)) ||
 	    (NULL == CU_add_test(pSuite, "test_get_matrix", test_get_matrix)) ||
 	    (NULL == CU_add_test(pSuite, "test_has_edge_count", test_has_edge_count_vertex_edge)) ||
